@@ -1,0 +1,84 @@
+<%
+let orderListHtml = '';
+
+if (orders && orders.length > 0) {
+  orders.forEach(order => {
+    // Determine badge color based on status
+    let badgeClass = 'bg-secondary';
+    if (order.status === 'Placed') badgeClass = 'bg-primary';
+    if (order.status === 'Shipped') badgeClass = 'bg-info';
+    if (order.status === 'Delivered') badgeClass = 'bg-success';
+    if (order.status === 'Cancelled') badgeClass = 'bg-danger';
+
+    // Format Date (Simple format)
+    const dateStr = new Date(order.createdAt).toLocaleDateString();
+
+    orderListHtml += `
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>
+            <strong>Order #${order._id.toString().slice(-6)}</strong> 
+            <span class="text-muted" style="font-size:0.9em">(${dateStr})</span>
+          </span>
+          <span class="badge ${badgeClass}">${order.status}</span>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <ul class="mb-0 pl-3">
+    `;
+
+    // Loop through items in this specific order
+    order.items.forEach(item => {
+      orderListHtml += `<li>${item.name} (x${item.quantity})</li>`;
+    });
+
+    orderListHtml += `
+              </ul>
+            </div>
+            <div class="col-md-4 text-end">
+               <h5 class="text-primary">$${order.total.toFixed(2)}</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+let bodyContent = `
+<div class="page-container" style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+  
+  <h1 class="text-center mb-4">Order History</h1>
+
+  <div class="card mb-5">
+    <div class="card-body p-4 bg-light">
+      <form action="/my-orders" method="POST" class="d-flex gap-2">
+        <input 
+          type="email" 
+          name="email" 
+          class="form-control" 
+          placeholder="Enter your email address to find orders..." 
+          value="${email || ''}" 
+          required
+        >
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+  </div>
+
+  ${error ? `<div class="alert alert-warning text-center">${error}</div>` : ''}
+
+  <div class="order-results">
+    ${orders && orders.length > 0 ? orderListHtml : ''}
+  </div>
+
+</div>
+`;
+%>
+
+<%- include('../layout', { 
+  title: 'My Orders', 
+  page: 'my-orders', 
+  body: bodyContent 
+}) %>

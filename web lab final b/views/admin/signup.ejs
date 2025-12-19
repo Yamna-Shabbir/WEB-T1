@@ -1,0 +1,110 @@
+<%- include('layout', {
+  title: 'Admin Signup - Gym Supplies Hub',
+  page: 'signup',
+  pageTitle: 'Admin Signup',
+  body: `
+    <div class="admin-card" style="max-width: 400px; margin: 50px auto;">
+      <div class="admin-card-header">
+        <h3><i class="fa-solid fa-user-plus"></i> Create Admin Account</h3>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <form id="signupForm" class="admin-form">
+        <div class="form-group-admin">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe">
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" class="form-control" required placeholder="admin@example.com">
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" class="form-control" required placeholder="Minimum 6 characters" minlength="6">
+          <small class="text-muted">Password must be at least 6 characters</small>
+        </div>
+        
+        <div class="form-actions-admin">
+          <a href="/admin/login" class="btn-admin btn-secondary-admin">Back to Login</a>
+          <button type="submit" class="btn-admin btn-primary-admin">
+            <i class="fa-solid fa-user-plus"></i> Sign Up
+          </button>
+        </div>
+      </form>
+      
+      <div class="text-center mt-3">
+        <p class="text-muted">Already have an account? <a href="/admin/login" style="color: #3b82f6;">Login</a></p>
+      </div>
+    </div>
+  `,
+  scripts: `
+    <script>
+      document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+        
+        const formData = new FormData(e.target);
+        const signupData = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          password: formData.get('password')
+        };
+        
+        // Validation
+        if (signupData.password.length < 6) {
+          showAlert('Password must be at least 6 characters', 'error');
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalText;
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/auth/admin/signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(signupData)
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            showAlert('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+              window.location.href = '/admin';
+            }, 1500);
+          } else {
+            showAlert(data.message || 'Signup failed', 'error');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+          }
+        } catch (error) {
+          console.error('Signup error:', error);
+          showAlert('Error creating account. Please try again.', 'error');
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalText;
+        }
+      });
+      
+      function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        container.innerHTML = '<div class="alert-admin ' + alertClass + '"><i class="fa-solid fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message + '</div>';
+        
+        setTimeout(() => {
+          container.innerHTML = '';
+        }, 5000);
+      }
+    </script>
+  `
+}) %>
+
+

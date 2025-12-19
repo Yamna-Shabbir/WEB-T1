@@ -1,0 +1,105 @@
+<%
+  // 1. Build the Table Rows using JavaScript Logic
+  let rowsHtml = '';
+  
+  if (orders && orders.length > 0) {
+    orders.forEach(order => {
+      // Logic for Status Badge Color
+      let badge = 'bg-secondary';
+      if(order.status === 'Placed') badge = 'bg-primary';
+      if(order.status === 'Processing') badge = 'bg-warning text-dark';
+      if(order.status === 'Delivered') badge = 'bg-success';
+      if(order.status === 'Cancelled') badge = 'bg-danger';
+      
+      // Logic for Disabled Button
+      let btnDisabled = (order.status === 'Delivered' || order.status === 'Cancelled') ? 'disabled' : '';
+      
+      // Logic for Dropdown Options (Preventing invalid transitions)
+      let optionsHtml = '<option disabled selected>Change to...</option>';
+      if (order.status === 'Placed') {
+         optionsHtml += '<option value="Processing">Processing</option><option value="Cancelled">Cancel Order</option>';
+      } else if (order.status === 'Processing') {
+         optionsHtml += '<option value="Delivered">Delivered</option><option value="Cancelled">Cancel Order</option>';
+      } else if (order.status === 'Delivered') {
+         optionsHtml += '<option disabled>Completed</option>';
+      } else if (order.status === 'Cancelled') {
+         optionsHtml += '<option disabled>Cancelled</option>';
+      }
+
+      // Format Date
+      let dateStr = new Date(order.createdAt).toLocaleDateString();
+      let orderIdShort = order._id.toString().slice(-6);
+      let totalFixed = order.total.toFixed(2);
+
+      // Append Row HTML
+      rowsHtml += `
+        <tr>
+          <td><small class="text-muted">#${orderIdShort}</small></td>
+          <td>
+            <div>${order.customer.fullName}</div>
+            <small class="text-muted">${order.customer.email}</small>
+          </td>
+          <td>$${totalFixed}</td>
+          <td>${dateStr}</td>
+          <td>
+            <span class="badge ${badge}">${order.status}</span>
+          </td>
+          <td>
+            <form action="/admin/orders/update-status" method="POST" class="d-flex gap-2">
+              <input type="hidden" name="orderId" value="${order._id}">
+              <select name="newStatus" class="form-select form-select-sm" style="width: 130px;">
+                ${optionsHtml}
+              </select>
+              <button type="submit" class="btn btn-sm btn-outline-primary" ${btnDisabled}>
+                Update
+              </button>
+            </form>
+          </td>
+        </tr>
+      `;
+    });
+  } else {
+    rowsHtml = `<tr><td colspan="6" class="text-center py-4">No orders found.</td></tr>`;
+  }
+
+  // 2. Build the Main Body Content
+  let bodyContent = `
+<div class="page-container" style="padding: 40px 20px;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Manage Orders</h1>
+    <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+
+  ${(typeof error !== 'undefined' && error) ? `<div class="alert alert-danger">${error}</div>` : ''}
+  ${(typeof success !== 'undefined' && success) ? `<div class="alert alert-success">${success}</div>` : ''}
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Date</th>
+              <th>Current Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+  `;
+%>
+
+<%- include('../layout', { 
+  title: 'Manage Orders',
+  page: 'admin-orders',
+  body: bodyContent
+}) %>

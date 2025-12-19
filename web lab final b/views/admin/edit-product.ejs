@@ -1,0 +1,159 @@
+<%- include('layout', {
+  title: 'Edit Product - Admin Panel',
+  page: 'products',
+  pageTitle: 'Edit Product',
+  body: `
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Edit Product</h3>
+        <a href="/admin/products" class="btn-admin btn-secondary-admin">
+          <i class="fa-solid fa-arrow-left"></i> Back to Products
+        </a>
+      </div>
+      
+      <div id="alertContainer"></div>
+      <div id="loadingMessage" class="text-center text-muted">Loading product...</div>
+      
+      <form id="productForm" class="admin-form" style="display: none;">
+        <input type="hidden" id="productId" name="productId">
+        
+        <div class="form-group-admin">
+          <label for="name">Product Name *</label>
+          <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="description">Description *</label>
+          <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group-admin">
+              <label for="price">Price ($) *</label>
+              <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group-admin">
+              <label for="stock">Stock Quantity *</label>
+              <input type="number" id="stock" name="stock" class="form-control" min="0" required>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="category">Category *</label>
+          <select id="category" name="category" class="form-control" required>
+            <option value="">Select Category</option>
+            <option value="Equipment">Equipment</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Supplements">Supplements</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="image">Image URL *</label>
+          <input type="text" id="image" name="image" class="form-control" placeholder="/images/product.jpg" required>
+          <small class="text-muted">Enter the path to the product image (e.g., /images/product.jpg)</small>
+        </div>
+        
+        <div class="form-actions-admin">
+          <a href="/admin/products" class="btn-admin btn-secondary-admin">Cancel</a>
+          <button type="submit" class="btn-admin btn-primary-admin">
+            <i class="fa-solid fa-save"></i> Update Product
+          </button>
+        </div>
+      </form>
+    </div>
+  `,
+  scripts: `
+    <script>
+      const productId = window.location.pathname.split('/').slice(-2)[0];
+      
+      async function loadProduct() {
+        try {
+          const response = await fetch('/api/products/' + productId);
+          const data = await response.json();
+          
+          if (data.success && data.product) {
+            const product = data.product;
+            document.getElementById('productId').value = product._id;
+            document.getElementById('name').value = product.name;
+            document.getElementById('description').value = product.description;
+            document.getElementById('price').value = product.price;
+            document.getElementById('stock').value = product.stock || 0;
+            document.getElementById('category').value = product.category;
+            document.getElementById('image').value = product.image;
+            
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('productForm').style.display = 'block';
+          } else {
+            document.getElementById('loadingMessage').innerHTML = '<div class="alert-admin alert-error"><i class="fa-solid fa-exclamation-circle"></i> Product not found</div>';
+          }
+        } catch (error) {
+          console.error('Error loading product:', error);
+          document.getElementById('loadingMessage').innerHTML = '<div class="alert-admin alert-error"><i class="fa-solid fa-exclamation-circle"></i> Error loading product</div>';
+        }
+      }
+      
+      document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const productData = {
+          name: formData.get('name'),
+          description: formData.get('description'),
+          price: parseFloat(formData.get('price')),
+          stock: parseInt(formData.get('stock')),
+          category: formData.get('category'),
+          image: formData.get('image')
+        };
+        
+        try {
+          const response = await fetch('/api/products/' + productId, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            showAlert('Product updated successfully!', 'success');
+            setTimeout(() => {
+              window.location.href = '/admin/products';
+            }, 1500);
+          } else {
+            showAlert(data.message || 'Error updating product', 'error');
+          }
+        } catch (error) {
+          console.error('Error updating product:', error);
+          showAlert('Error updating product. Please try again.', 'error');
+        }
+      });
+      
+      function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        container.innerHTML = '<div class="alert-admin ' + alertClass + '"><i class="fa-solid fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message + '</div>';
+        
+        setTimeout(() => {
+          container.innerHTML = '';
+        }, 5000);
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        loadProduct();
+      });
+    </script>
+  `
+}) %>
+
+
+
+

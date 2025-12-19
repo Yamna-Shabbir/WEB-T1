@@ -1,0 +1,217 @@
+<%- include('../layout', { 
+  title: 'Admin Panel - Gym Supplies Hub',
+  page: 'admin',
+  body: `
+    <div class="page-container">
+      <h1>Admin Panel - Product Management</h1>
+      
+      <div class="admin-panel">
+        <div class="admin-actions">
+          <button class="btn btn-primary" onclick="showAddForm()">
+            <i class="fa-solid fa-plus"></i> Add New Product
+          </button>
+        </div>
+
+        <!-- Add/Edit Product Form -->
+        <div id="productFormModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 id="formTitle">Add New Product</h2>
+              <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="productForm" class="admin-form">
+              <input type="hidden" id="productId" name="productId">
+              <div class="form-group">
+                <label for="productName" class="form-label">Product Name *</label>
+                <input type="text" class="form-control" id="productName" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="productDescription" class="form-label">Description *</label>
+                <textarea class="form-control" id="productDescription" name="description" rows="3" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="productPrice" class="form-label">Price *</label>
+                <input type="number" class="form-control" id="productPrice" name="price" step="0.01" min="0" required>
+              </div>
+              <div class="form-group">
+                <label for="productImage" class="form-label">Image URL *</label>
+                <input type="text" class="form-control" id="productImage" name="image" required>
+              </div>
+              <div class="form-group">
+                <label for="productCategory" class="form-label">Category *</label>
+                <select class="form-control" id="productCategory" name="category" required>
+                  <option value="">Select Category</option>
+                  <option value="Cardio Equipment">Cardio Equipment</option>
+                  <option value="Strength Training">Strength Training</option>
+                  <option value="Functional">Functional</option>
+                  <option value="Home Gym Essential">Home Gym Essential</option>
+                  <option value="Recovery and Wellness">Recovery and Wellness</option>
+                  <option value="Sports and Play">Sports and Play</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="products-admin-list">
+          <h3>All Products</h3>
+          <div id="productsList" class="products-grid-admin">
+            <!-- Products will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  scripts: `
+    <script>
+      let products = [];
+      let editingProductId = null;
+
+      document.addEventListener('DOMContentLoaded', function() {
+        loadProducts();
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          saveProduct();
+        });
+      });
+
+      async function loadProducts() {
+        try {
+          const response = await fetch('/api/products');
+          const data = await response.json();
+          if (data.success) {
+            products = data.products;
+            displayProducts();
+          } else {
+            console.error('Failed to load products:', data.message);
+            products = [];
+            displayProducts();
+          }
+        } catch (error) {
+          console.error('Error loading products:', error);
+          products = [];
+          displayProducts();
+        }
+      }
+
+      function displayProducts() {
+  const productsList = document.getElementById('productsList');
+  if (products.length === 0) {
+    productsList.innerHTML = '<p style="text-align: center; color: var(--text-medium); padding: 40px;">No products found. Add your first product!</p>';
+    return;
+  }
+
+  productsList.innerHTML = products.map(function(product) {
+    return '<div class="product-admin-card">' +
+      '<img src="' + product.image + '" alt="' + product.name + '" onerror="this.src=\'/images/sensoryimg.jpeg\'">' +
+      '<div class="product-admin-info">' +
+      '<h4>' + product.name + '</h4>' +
+      '<p>' + product.description + '</p>' +
+      '<div class="product-admin-meta">' +
+      '<span class="price">$' + parseFloat(product.price).toFixed(2) + '</span>' +
+      '<span class="category">' + product.category + '</span>' +
+      '</div>' +
+      '<div class="product-admin-actions">' +
+      '<button class="btn btn-edit" onclick="editProduct(\'' + product._id + '\')">' +
+      '<i class="fa-solid fa-edit"></i> Edit' +
+      '</button>' +
+      '<button class="btn btn-delete" onclick="deleteProduct(\'' + product._id + '\')">' +
+      '<i class="fa-solid fa-trash"></i> Delete' +
+      '</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+
+      function showAddForm() {
+        editingProductId = null;
+        document.getElementById('formTitle').textContent = 'Add New Product';
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '';
+        document.getElementById('productFormModal').style.display = 'block';
+      }
+
+      function editProduct(id) {
+        const product = products.find(p => p._id === id);
+        if (!product) return;
+
+        editingProductId = id;
+        document.getElementById('formTitle').textContent = 'Edit Product';
+        document.getElementById('productId').value = product._id;
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productDescription').value = product.description;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productImage').value = product.image;
+        document.getElementById('productCategory').value = product.category;
+        document.getElementById('productFormModal').style.display = 'block';
+      }
+
+      async function deleteProduct(id) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        try {
+          const response = await fetch('/api/products/' + id, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) loadProducts();
+          else alert('Failed to delete product: ' + data.message);
+        } catch (error) {
+          console.error('Error deleting product:', error);
+          alert('Error deleting product. Check console.');
+        }
+      }
+
+      async function saveProduct() {
+        const formData = new FormData(document.getElementById('productForm'));
+        const productData = {
+          name: formData.get('name'),
+          description: formData.get('description'),
+          price: formData.get('price'),
+          image: formData.get('image'),
+          category: formData.get('category')
+        };
+
+        try {
+          let response;
+          if (editingProductId) {
+            response = await fetch('/api/products/' + editingProductId, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(productData)
+            });
+          } else {
+            response = await fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(productData)
+            });
+          }
+
+          const data = await response.json();
+          if (data.success) {
+            closeModal();
+            loadProducts();
+          } else alert('Failed to save product: ' + data.message);
+        } catch (error) {
+          console.error('Error saving product:', error);
+          alert('Error saving product. Check console.');
+        }
+      }
+
+      function closeModal() {
+        document.getElementById('productFormModal').style.display = 'none';
+        editingProductId = null;
+      }
+
+      window.onclick = function(event) {
+        const modal = document.getElementById('productFormModal');
+        if (event.target === modal) closeModal();
+      };
+    </script>
+  `
+}) %>

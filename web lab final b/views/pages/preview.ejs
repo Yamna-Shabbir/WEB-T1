@@ -1,0 +1,128 @@
+<%
+// Build Cart Items HTML
+let cartHtml = '';
+if(cart && cart.length > 0) {
+    cart.forEach(item => {
+      cartHtml += `
+        <div class="preview-item mb-3 pb-3 border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <img src="${item.product.image}" alt="${item.product.name}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                <div>
+                  <h6 class="mb-0">${item.product.name}</h6>
+                  <small class="text-muted">Qty: ${item.quantity} x $${item.product.price.toFixed(2)}</small>
+                </div>
+            </div>
+            <span class="fw-bold">$${(item.product.price * item.quantity).toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    });
+}
+
+// Logic to conditionally show the Discount Row
+let discountRowHtml = '';
+if (orderInfo.discount && orderInfo.discount > 0) {
+    discountRowHtml = `
+    <div class="d-flex justify-content-between mb-2 text-success">
+        <span>Discount (${orderInfo.couponCode || 'Applied'}):</span>
+        <span>-$${orderInfo.discount.toFixed(2)}</span>
+    </div>
+    `;
+}
+
+let bodyContent = `
+<div class="page-container">
+  <div class="text-center mb-4">
+    <h1>Order Preview</h1>
+    <p class="text-muted">Please review your details before confirming.</p>
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-8">
+      
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fa-solid fa-truck-fast me-2"></i> Shipping Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="text-muted small">Full Name</label>
+                <div class="fw-bold">${orderInfo.customer.fullName}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="text-muted small">Email Address</label>
+                <div class="fw-bold">${orderInfo.customer.email}</div>
+            </div>
+            <div class="col-12 mb-3">
+                <label class="text-muted small">Address</label>
+                <div class="fw-bold">${orderInfo.customer.address}, ${orderInfo.customer.city} ${orderInfo.customer.zipCode}</div>
+            </div>
+             <div class="col-12">
+                <label class="text-muted small">Payment Method</label>
+                <div class="fw-bold text-uppercase badge bg-light text-dark border">
+                    ${orderInfo.paymentMethod}
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fa-solid fa-basket-shopping me-2"></i> Items in Cart</h5>
+        </div>
+        <div class="card-body">
+          ${cartHtml}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+        <div class="card-body p-4">
+          <h3 class="card-title h4 mb-4">Order Summary</h3>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal:</span>
+            <span>$${orderInfo.subtotal.toFixed(2)}</span>
+          </div>
+
+          ${discountRowHtml}
+
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">Shipping:</span>
+            <span class="text-success">Free</span>
+          </div>
+          
+          <hr>
+
+          <div class="d-flex justify-content-between total-row mb-4">
+            <span class="h5">Total:</span>
+            <span class="h4 text-primary">$${orderInfo.total.toFixed(2)}</span>
+          </div>
+
+          <form action="/order/confirm" method="POST">
+            <button type="submit" class="btn btn-success w-100 mb-3 py-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-check me-2"></i> Confirm Order
+            </button>
+          </form>
+          
+          <a href="/checkout" class="btn btn-outline-secondary w-100 py-2">
+            <i class="fa-solid fa-arrow-left me-2"></i> Edit Details
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+%>
+
+<%- include('../layout', { 
+  title: 'Order Preview',
+  page: 'checkout',
+  body: bodyContent
+}) %>

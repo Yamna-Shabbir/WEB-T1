@@ -1,0 +1,377 @@
+<<<<<<< HEAD
+<%
+// 1. Prepare dynamic data using JavaScript to avoid EJS nesting errors
+let cartItemsHtml = '';
+
+if (typeof cart !== 'undefined' && cart.length > 0) {
+  cart.forEach(item => {
+    cartItemsHtml += `
+      <div class="d-flex justify-content-between mb-2" style="border-bottom: 1px solid #eee; padding-bottom: 8px;">
+        <div>
+            <strong>${item.product.name}</strong>
+            <div style="font-size: 0.85em; color: #666;">Quantity: ${item.quantity}</div>
+        </div>
+        <span>$${(item.product.price * item.quantity).toFixed(2)}</span>
+      </div>
+    `;
+  });
+} else {
+  cartItemsHtml = `<p class="text-center text-muted">Your cart is currently empty.</p>`;
+}
+
+let subtotalStr = typeof subtotal !== 'undefined' ? subtotal.toFixed(2) : '0.00';
+let totalStr = typeof total !== 'undefined' ? total.toFixed(2) : '0.00';
+
+let bodyContent = `
+=======
+<%- include('../layout', { 
+  title: 'Checkout - Gym Supplies Hub',
+  page: 'checkout',
+  body: `
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+<div class="page-container">
+  <h1>Checkout</h1>
+
+  <div class="checkout-form">
+<<<<<<< HEAD
+    
+    <form id="checkoutForm" action="/checkout/process" method="POST">
+
+=======
+    <h2>Order Summary</h2>
+
+    <form id="checkoutForm" action="/checkout/process" method="POST">
+
+      <!-- Shipping Information -->
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+      <div class="mb-4">
+        <h3>Shipping Information</h3>
+        <div class="form-group">
+          <label for="fullName" class="form-label">Full Name *</label>
+          <input type="text" class="form-control" id="fullName" name="fullName" required>
+        </div>
+        <div class="form-group">
+          <label for="email" class="form-label">Email *</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="address" class="form-label">Address *</label>
+          <input type="text" class="form-control" id="address" name="address" required>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="city" class="form-label">City *</label>
+              <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="zipCode" class="form-label">Zip Code *</label>
+              <input type="text" class="form-control" id="zipCode" name="zipCode" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<<<<<<< HEAD
+=======
+      <!-- Payment Information -->
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+      <div class="mb-4">
+        <h3>Payment Information</h3>
+        <div class="form-group">
+          <label class="form-label">Payment Method *</label>
+          <div class="payment-methods">
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="card" required checked>
+              <span class="payment-method-label">
+                <i class="fa-solid fa-credit-card"></i> Credit/Debit Card
+              </span>
+            </label>
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="paypal" required>
+              <span class="payment-method-label">
+                <i class="fa-brands fa-paypal"></i> PayPal
+              </span>
+            </label>
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="bank" required>
+              <span class="payment-method-label">
+                <i class="fa-solid fa-university"></i> Bank Transfer
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div id="cardDetails" class="card-details-section">
+          <div class="form-group">
+            <label for="cardNumber" class="form-label">Card Number *</label>
+            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="expiryDate" class="form-label">Expiry Date *</label>
+                <input type="text" class="form-control" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="cvv" class="form-label">CVV *</label>
+                <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" maxlength="4">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="paypalDetails" class="payment-details-section" style="display: none;">
+          <div class="form-group">
+            <label for="paypalEmail" class="form-label">PayPal Email *</label>
+            <input type="email" class="form-control" id="paypalEmail" name="paypalEmail" placeholder="your.email@example.com">
+          </div>
+        </div>
+
+        <div id="bankDetails" class="payment-details-section" style="display: none;">
+          <div class="form-group">
+            <label for="bankAccount" class="form-label">Bank Account Number *</label>
+            <input type="text" class="form-control" id="bankAccount" name="bankAccount" placeholder="Account Number">
+          </div>
+          <div class="form-group">
+            <label for="bankName" class="form-label">Bank Name *</label>
+            <input type="text" class="form-control" id="bankName" name="bankName" placeholder="Bank Name">
+          </div>
+        </div>
+      </div>
+
+<<<<<<< HEAD
+      <div class="mb-4">
+        <label for="couponCode" class="form-label" style="font-weight:600;">Have a Coupon?</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Enter code (e.g. SAVE10)">
+        </div>
+        <small class="text-muted">Discount will be calculated on the next step.</small>
+      </div>
+
+      <div class="mb-4">
+        <h3>Order Summary</h3>
+        
+        <div class="cart-items-container mb-3" style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+          ${cartItemsHtml}
+        </div>
+
+        <div class="order-summary-box">
+          <div class="order-summary-row">
+            <span>Subtotal:</span>
+            <span>$${subtotalStr}</span>
+=======
+      <!-- Order Total -->
+      <div class="mb-4">
+        <h3>Order Total</h3>
+        <div class="order-summary-box">
+          <div class="order-summary-row">
+            <span>Subtotal:</span>
+            <span>$0.00</span>
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+          </div>
+          <div class="order-summary-row">
+            <span>Shipping:</span>
+            <span>Free</span>
+          </div>
+          <div class="order-summary-total">
+            <span>Total:</span>
+<<<<<<< HEAD
+            <span>$${totalStr}</span>
+=======
+            <span>$0.00</span>
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+          </div>
+        </div>
+      </div>
+
+<<<<<<< HEAD
+=======
+      <!-- Accept Terms Checkbox -->
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+      <div class="mb-4 form-check">
+        <input type="checkbox" class="form-check-input" id="termsCheck">
+        <label class="form-check-label" for="termsCheck">I accept all Terms and Conditions</label>
+      </div>
+
+<<<<<<< HEAD
+      <button type="submit" id="submitButton" class="btn btn-primary" style="width:100%; padding:15px; font-size:18px;" disabled>
+        Proceed to Preview
+=======
+      <!-- Complete Order Button -->
+      <button type="submit" id="submitButton" class="btn btn-primary" style="width:100%; padding:15px; font-size:18px;" disabled>
+        Complete Order
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<script>
+<<<<<<< HEAD
+  // UI Logic for Payment Methods
+=======
+  // Payment method selection handler
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+  const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+  const cardDetails = document.getElementById('cardDetails');
+  const paypalDetails = document.getElementById('paypalDetails');
+  const bankDetails = document.getElementById('bankDetails');
+  const cardInputs = cardDetails.querySelectorAll('input');
+  const paypalInputs = paypalDetails.querySelectorAll('input');
+  const bankInputs = bankDetails.querySelectorAll('input');
+
+  paymentMethods.forEach(method => {
+    method.addEventListener('change', function() {
+      cardDetails.style.display = 'none';
+      paypalDetails.style.display = 'none';
+      bankDetails.style.display = 'none';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+      [...cardInputs, ...paypalInputs, ...bankInputs].forEach(input => input.removeAttribute('required'));
+
+      if (this.value === 'card') {
+        cardDetails.style.display = 'block';
+        cardInputs.forEach(input => input.setAttribute('required', 'required'));
+      } else if (this.value === 'paypal') {
+        paypalDetails.style.display = 'block';
+        paypalInputs.forEach(input => input.setAttribute('required', 'required'));
+      } else if (this.value === 'bank') {
+        bankDetails.style.display = 'block';
+        bankInputs.forEach(input => input.setAttribute('required', 'required'));
+      }
+    });
+  });
+
+<<<<<<< HEAD
+  // Formatting scripts
+  const cardNumberInput = document.getElementById('cardNumber');
+  if(cardNumberInput) cardNumberInput.addEventListener('input', e => {
+    let value = e.target.value.replace(/\\s/g,'');
+    e.target.value = value.match(/.{1,4}/g)?.join(' ') || value;
+  });
+
+  const expiryInput = document.getElementById('expiryDate');
+  if(expiryInput) expiryInput.addEventListener('input', e => {
+    let value = e.target.value.replace(/\\D/g,'');
+=======
+  // Card number formatting
+  const cardNumberInput = document.getElementById('cardNumber');
+  if(cardNumberInput) cardNumberInput.addEventListener('input', e => {
+    let value = e.target.value.replace(/\s/g,'');
+    e.target.value = value.match(/.{1,4}/g)?.join(' ') || value;
+  });
+
+  // Expiry date formatting
+  const expiryInput = document.getElementById('expiryDate');
+  if(expiryInput) expiryInput.addEventListener('input', e => {
+    let value = e.target.value.replace(/\D/g,'');
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+    if(value.length >= 2) value = value.substring(0,2)+'/'+value.substring(2,4);
+    e.target.value = value;
+  });
+
+<<<<<<< HEAD
+  const cvvInput = document.getElementById('cvv');
+  if(cvvInput) cvvInput.addEventListener('input', e => e.target.value = e.target.value.replace(/\\D/g,''));
+
+  // Validation Logic
+=======
+  // CVV formatting
+  const cvvInput = document.getElementById('cvv');
+  if(cvvInput) cvvInput.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g,''));
+
+  // Form validation
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+  const checkoutForm = document.getElementById('checkoutForm');
+  const submitButton = document.getElementById('submitButton');
+  const termsCheck = document.getElementById('termsCheck');
+
+<<<<<<< HEAD
+  termsCheck.addEventListener('change', function() {
+    const totalAmount = parseFloat('${totalStr}');
+    if (totalAmount <= 0) {
+        alert("Your cart is empty!");
+        this.checked = false; 
+        return;
+    }
+=======
+  // Enable submit only if checkbox is checked
+  termsCheck.addEventListener('change', function() {
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+    submitButton.disabled = !this.checked;
+  });
+
+  checkoutForm.addEventListener('submit', function(e) {
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+<<<<<<< HEAD
+    if(!selectedMethod) { e.preventDefault(); alert('Please select a payment method'); return false; }
+    
+    if(selectedMethod.value === 'card') {
+      const cn = document.getElementById('cardNumber').value.replace(/\\s/g,'');
+      const ed = document.getElementById('expiryDate').value;
+      const cv = document.getElementById('cvv').value;
+      if(cn.length < 13 || cn.length > 19) { e.preventDefault(); alert('Invalid card number'); return false; }
+      if(!ed || ed.length !== 5) { e.preventDefault(); alert('Invalid expiry date'); return false; }
+      if(!cv || cv.length < 3) { e.preventDefault(); alert('Invalid CVV'); return false; }
+    } else if(selectedMethod.value === 'paypal') {
+       if(!document.getElementById('paypalEmail').value.includes('@')) { e.preventDefault(); alert('Invalid PayPal email'); return false; }
+    } else if(selectedMethod.value === 'bank') {
+       if(!document.getElementById('bankAccount').value || !document.getElementById('bankName').value) { e.preventDefault(); alert('Missing bank details'); return false; }
+    }
+  });
+</script>
+`;
+%>
+
+<%- include('../layout', { 
+  title: 'Checkout - Gym Supplies Hub',
+  page: 'checkout',
+  body: bodyContent
+}) %>
+=======
+
+    if(!selectedMethod) {
+      e.preventDefault();
+      alert('Please select a payment method');
+      return false;
+    }
+
+    if(selectedMethod.value === 'card') {
+      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g,'');
+      const expiryDate = document.getElementById('expiryDate').value;
+      const cvv = document.getElementById('cvv').value;
+
+      if(cardNumber.length < 13 || cardNumber.length > 19) {
+        e.preventDefault(); alert('Please enter a valid card number'); return false;
+      }
+      if(!expiryDate || expiryDate.length !== 5) {
+        e.preventDefault(); alert('Please enter a valid expiry date (MM/YY)'); return false;
+      }
+      if(!cvv || cvv.length < 3) {
+        e.preventDefault(); alert('Please enter a valid CVV'); return false;
+      }
+    } else if(selectedMethod.value === 'paypal') {
+      const paypalEmail = document.getElementById('paypalEmail').value;
+      if(!paypalEmail || !paypalEmail.includes('@')) {
+        e.preventDefault(); alert('Please enter a valid PayPal email'); return false;
+      }
+    } else if(selectedMethod.value === 'bank') {
+      const bankAccount = document.getElementById('bankAccount').value;
+      const bankName = document.getElementById('bankName').value;
+      if(!bankAccount || !bankName) {
+        e.preventDefault(); alert('Please fill in all bank transfer details'); return false;
+      }
+    }
+  });
+</script>
+  `
+}) %>
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0

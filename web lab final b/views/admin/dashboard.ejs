@@ -1,0 +1,132 @@
+<%- include('layout', {
+  title: 'Admin Dashboard - Gym Supplies Hub',
+  page: 'dashboard',
+  pageTitle: 'Dashboard',
+  body: `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-card-title">Total Products</span>
+          <div class="stat-card-icon blue">
+            <i class="fa-solid fa-box"></i>
+          </div>
+        </div>
+        <p class="stat-card-value" id="totalProducts">-</p>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-card-title">Total Categories</span>
+          <div class="stat-card-icon green">
+            <i class="fa-solid fa-tags"></i>
+          </div>
+        </div>
+        <p class="stat-card-value" id="totalCategories">-</p>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-card-title">Total Stock</span>
+          <div class="stat-card-icon yellow">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
+        </div>
+        <p class="stat-card-value" id="totalStock">-</p>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Quick Actions</h3>
+      </div>
+      <div class="d-flex gap-3 flex-wrap">
+<<<<<<< HEAD
+        
+        <a href="/admin/orders" class="btn-admin" style="background-color: #6f42c1; color: white; border: 1px solid #6f42c1;">
+          <i class="fa-solid fa-truck-fast"></i> Manage Orders
+        </a>
+
+=======
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
+        <a href="/admin/products/add" class="btn-admin btn-primary-admin">
+          <i class="fa-solid fa-plus"></i> Add New Product
+        </a>
+        <a href="/admin/products" class="btn-admin btn-success-admin">
+          <i class="fa-solid fa-list"></i> View All Products
+        </a>
+        <a href="/shop" class="btn-admin btn-info-admin" target="_blank">
+          <i class="fa-solid fa-store"></i> View Shop
+        </a>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Recent Products</h3>
+        <a href="/admin/products" class="btn-admin btn-sm-admin btn-primary-admin">View All</a>
+      </div>
+      <div id="recentProducts">
+        <p class="text-center text-muted">Loading...</p>
+      </div>
+    </div>
+  `,
+  scripts: `
+    <script>
+      async function loadDashboardStats() {
+        try {
+          const response = await fetch('/api/admin/stats');
+          const data = await response.json();
+          
+          if (data.success) {
+            document.getElementById('totalProducts').textContent = data.stats.totalProducts || 0;
+            document.getElementById('totalCategories').textContent = data.stats.totalCategories || 0;
+            document.getElementById('totalStock').textContent = data.stats.totalStock || 0;
+          }
+        } catch (error) {
+          console.error('Error loading stats:', error);
+        }
+      }
+
+      async function loadRecentProducts() {
+        try {
+          const response = await fetch('/api/products?limit=5');
+          const data = await response.json();
+          
+          const container = document.getElementById('recentProducts');
+          
+          if (data.success && data.products && data.products.length > 0) {
+            container.innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>' +
+              data.products.map(product => 
+                '<tr>' +
+                  '<td>' + product.name + '</td>' +
+                  '<td><span class="badge-admin badge-info">' + product.category + '</span></td>' +
+                  '<td>$' + parseFloat(product.price).toFixed(2) + '</td>' +
+                  '<td>' + (product.stock || 0) + '</td>' +
+                  '<td><a href="/admin/products/' + product._id + '/edit" class="btn-admin btn-sm-admin btn-warning-admin"><i class="fa-solid fa-edit"></i> Edit</a></td>' +
+                '</tr>'
+              ).join('') +
+              '</tbody></table>';
+          } else {
+            container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>No products yet</h3><p>Add your first product to get started.</p></div>';
+          }
+        } catch (error) {
+          console.error('Error loading recent products:', error);
+          document.getElementById('recentProducts').innerHTML = '<p class="text-center text-danger">Error loading products</p>';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardStats();
+        loadRecentProducts();
+      });
+    </script>
+  `
+<<<<<<< HEAD
+}) %>
+=======
+}) %>
+
+
+
+
+>>>>>>> 1eb1b13e724692014992b888a3cc891143a3a4c0
