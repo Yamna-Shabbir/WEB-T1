@@ -1,0 +1,176 @@
+<%- include('layout', {
+  title: 'Add Product - Admin Panel',
+  page: 'add-product',
+  pageTitle: 'Add New Product',
+  body: `
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Add New Product</h3>
+        <a href="/admin/products" class="btn-admin btn-secondary-admin">
+          <i class="fa-solid fa-arrow-left"></i> Back to Products
+        </a>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <form id="productForm" class="admin-form">
+        <div class="form-group-admin">
+          <label for="name">Product Name *</label>
+          <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="description">Description *</label>
+          <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group-admin">
+              <label for="price">Price ($) *</label>
+              <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group-admin">
+              <label for="stock">Stock Quantity *</label>
+              <input type="number" id="stock" name="stock" class="form-control" min="0" value="0" required>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="category">Category *</label>
+          <select id="category" name="category" class="form-control" required>
+            <option value="">Select Category</option>
+            <option value="Equipment">Equipment</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Supplements">Supplements</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </div>
+        
+        <div class="form-group-admin">
+          <label for="image">Image URL *</label>
+          <input type="text" id="image" name="image" class="form-control" placeholder="/images/product.jpg" required>
+          <small class="text-muted">Enter the path to the product image (e.g., /images/product.jpg)</small>
+        </div>
+        
+        <div class="form-actions-admin">
+          <a href="/admin/products" class="btn-admin btn-secondary-admin">Cancel</a>
+          <button type="submit" class="btn-admin btn-primary-admin">
+            <i class="fa-solid fa-save"></i> Create Product
+          </button>
+        </div>
+      </form>
+    </div>
+  `,
+  scripts: `
+    <script>
+      document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const productData = {
+          name: formData.get('name'),
+          description: formData.get('description'),
+          price: parseFloat(formData.get('price')),
+          stock: parseInt(formData.get('stock')),
+          category: formData.get('category'),
+          image: formData.get('image')
+        };
+        
+        // Show loading state
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+        
+        try {
+          // Validate form data before sending
+          if (!productData.name || !productData.description || !productData.price || !productData.image || !productData.category) {
+            showAlert('Please fill in all required fields', 'error');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+            return;
+          }
+          
+          if (isNaN(productData.price) || productData.price <= 0) {
+            showAlert('Please enter a valid price (must be a positive number)', 'error');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+            return;
+          }
+          
+          console.log('Sending product data:', productData);
+          
+          const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+          });
+          
+          console.log('Response status:', response.status);
+          
+          let data;
+          try {
+            data = await response.json();
+            console.log('Response from server:', data);
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+            const text = await response.text();
+            console.error('Response text:', text);
+            showAlert('Server error: Could not parse response. Status: ' + response.status, 'error');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+            return;
+          }
+          
+          if (data.success) {
+            showAlert('Product created successfully!', 'success');
+            setTimeout(() => {
+              window.location.href = '/admin/products';
+            }, 1500);
+          } else {
+            // Show detailed error message
+            let errorMsg = data.message || 'Error creating product';
+            if (data.error) {
+              errorMsg += ' - ' + data.error;
+            }
+            if (data.received) {
+              const missingFields = Object.entries(data.received)
+                .filter(([k, v]) => !v)
+                .map(([k]) => k);
+              if (missingFields.length > 0) {
+                errorMsg += ' Missing: ' + missingFields.join(', ');
+              }
+            }
+            showAlert(errorMsg, 'error');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+          }
+        } catch (error) {
+          console.error('Error creating product:', error);
+          console.error('Error stack:', error.stack);
+          showAlert('Network error: ' + (error.message || 'Could not connect to server. Please check if the server is running.'), 'error');
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalText;
+        }
+      });
+      
+      function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        container.innerHTML = '<div class="alert-admin ' + alertClass + '"><i class="fa-solid fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message + '</div>';
+        
+        setTimeout(() => {
+          container.innerHTML = '';
+        }, 5000);
+      }
+    </script>
+  `
+}) %>
+

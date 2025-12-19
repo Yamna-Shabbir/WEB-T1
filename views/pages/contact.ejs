@@ -1,0 +1,45 @@
+<%- include('../layout', { 
+  title: 'Contact Us - Gym Supplies Hub',
+  page: 'contact',
+  body: `
+    <div class="page-container">
+      <h1>Contact Us</h1>
+      
+      <div class="contact-content">
+        <div class="mb-4">
+          <h3>Get in Touch</h3>
+          <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        </div>
+
+        <div class="contact-info-section">
+          <h5>📞 Phone</h5>
+          <p>+92 321 2723706</p>
+        </div>
+
+        <div class="contact-info-section">
+          <h5>📍 Address</h5>
+          <p class="address-text">Unit 2, 20 Woodland Ave, Slough SL1 3BU</p>
+        </div>
+
+        <form id="contactForm" action="/contact/submit" method="POST">
+          <div class="form-group">
+            <label for="contactName" class="form-label">Name *</label>
+            <input type="text" class="form-control" id="contactName" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="contactEmail" class="form-label">Email *</label>
+            <input type="email" class="form-control" id="contactEmail" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="message" class="form-label">Message *</label>
+            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  `
+}) %>
+
